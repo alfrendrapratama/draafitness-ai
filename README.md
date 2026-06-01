@@ -97,7 +97,7 @@ The application is now ready to use! Enjoy training with your AI Coach!
 │   ├── 📁 services/         # Calculator logic & AI Prompt Builder
 │   └── 📁 utils/            # Middleware (Security & Rate Limiter)
 │
-└── README.md             # This documentation
+└── 📄 README.md             # This documentation
 ```
 
 ## 🔒 Security & Privacy Notes
