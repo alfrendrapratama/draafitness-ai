@@ -1163,15 +1163,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Update Daily Goal & Macros (Sync with Session Progress)
         let totalCal = 0;
-        let totalPro = 0; // Simplified estimation for macros based on logged food
+        let totalPro = 0; 
         let totalCarb = 0;
         let totalFat = 0;
         
+        // PERBAIKAN: Ambil data secara lokal dari session storage, bukan dari variabel global
+        const sessionData = loadFromSession('sessionLog');
+        
         // Jika ada kalori yang di-log di active session
-        if (currentSession && currentSession.nutritionLog) {
-            currentSession.nutritionLog.forEach(food => {
+        if (sessionData && sessionData.nutritionLog) {
+            sessionData.nutritionLog.forEach(food => {
                 totalCal += parseInt(food.calories) || 0;
-                // Rough estimate just for visual dashboard feedback
+                // Estimasi kasar makro untuk visualisasi dashboard
                 totalPro += Math.round(food.calories * 0.05); 
                 totalCarb += Math.round(food.calories * 0.1);
                 totalFat += Math.round(food.calories * 0.03);
@@ -1179,38 +1182,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const targetCal = profile ? (profile.targetCalories || 0) : 0;
-        document.getElementById('dashCalorieText').innerHTML = `${totalCal} <span style="font-size: 1rem; color: var(--text-muted)">/ ${targetCal} Kcal</span>`;
+        const dashCalorieText = document.getElementById('dashCalorieText');
+        const dashCalorieBar = document.getElementById('dashCalorieBar');
         
-        const percent = targetCal > 0 ? Math.min((totalCal / targetCal) * 100, 100) : 0;
-        document.getElementById('dashCalorieBar').style.width = `${percent}%`;
-        document.getElementById('dashCalorieBar').style.background = percent > 100 ? 'var(--danger-red)' : 'var(--primary-color)';
+        if (dashCalorieText && dashCalorieBar) {
+            dashCalorieText.innerHTML = `${totalCal} <span style="font-size: 1rem; color: var(--text-muted)">/ ${Math.round(targetCal)} Kcal</span>`;
+            const percent = targetCal > 0 ? Math.min((totalCal / targetCal) * 100, 100) : 0;
+            dashCalorieBar.style.width = `${percent}%`;
+            dashCalorieBar.style.background = percent >= 100 ? 'var(--danger-red)' : 'var(--primary-color)';
+        }
 
-        document.getElementById('dashProteinText').textContent = `${totalPro}g`;
-        document.getElementById('dashCarbsText').textContent = `${totalCarb}g`;
-        document.getElementById('dashFatText').textContent = `${totalFat}g`;
+        const dashProteinText = document.getElementById('dashProteinText');
+        const dashCarbsText = document.getElementById('dashCarbsText');
+        const dashFatText = document.getElementById('dashFatText');
+        
+        if (dashProteinText) dashProteinText.textContent = `${totalPro}g`;
+        if (dashCarbsText) dashCarbsText.textContent = `${totalCarb}g`;
+        if (dashFatText) dashFatText.textContent = `${totalFat}g`;
 
         // 3. Update Today's Workout
         const savedPlan = loadFromSession('workoutPlan');
         const workoutContainer = document.getElementById('dashWorkoutContainer');
         
-        if (savedPlan && savedPlan.weekly_schedule && savedPlan.weekly_schedule.length > 0) {
-            // Ambil jadwal hari pertama sebagai representasi "Today"
-            const todayPlan = savedPlan.weekly_schedule[0]; 
+        // PERBAIKAN: Tangani perbedaan format key JSON dari AI (weekly_schedule vs weeklySchedule)
+        const scheduleArray = savedPlan ? (savedPlan.weekly_schedule || savedPlan.weeklySchedule) : null;
+        
+        if (workoutContainer && scheduleArray && scheduleArray.length > 0) {
+            const todayPlan = scheduleArray[0]; 
             
             let exercisesHTML = '';
-            if (todayPlan.exercises) {
+            if (todayPlan.exercises && todayPlan.exercises.length > 0) {
                 exercisesHTML = todayPlan.exercises.slice(0, 3).map(ex => 
                     `<div style="font-size: 0.85rem; padding: 8px; background: var(--glass-input); border-radius: 6px; margin-bottom: 5px;">
                         <strong>${ex.name}</strong> • ${ex.sets} Sets
                     </div>`
                 ).join('');
+                // Tampilkan label + N more jika lebih dari 3 latihan
                 if (todayPlan.exercises.length > 3) {
                     exercisesHTML += `<div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 5px;">+ ${todayPlan.exercises.length - 3} more exercises</div>`;
                 }
+            } else {
+                exercisesHTML = `<p class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 10px;">Rest day. Fokus pada pemulihan Anda.</p>`;
             }
 
             workoutContainer.innerHTML = `
-                <h4 style="color: var(--primary-color); margin-bottom: 5px;">${todayPlan.day}: ${todayPlan.type}</h4>
+                <h4 style="color: var(--primary-color); margin-bottom: 5px;">${todayPlan.day || 'Day 1'}: ${todayPlan.type || 'Workout'}</h4>
                 <div style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px;">
                     ${exercisesHTML}
                 </div>
@@ -1220,9 +1236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
     }
-
-    // Panggil saat halaman dimuat
-    updateDashboard();
 
     // --- 8. AI CHATBOT LOGIC ---
     const chatInput = document.getElementById('aiChatInput');
