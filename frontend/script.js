@@ -28,9 +28,19 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Target ID:', targetId);
             const targetSection = document.getElementById(targetId);
             console.log('Target Section:', targetSection);
+            
             if (targetSection) {
                 targetSection.classList.add('active');
                 console.log('Active class added to:', targetId);
+                
+                // --- PERBAIKAN: Trigger updateDashboard jika targetnya adalah dashboard ---
+                if (targetId === 'dashboard-view') {
+                    // Pastikan fungsi updateDashboard sudah terdeklarasi di scope file script.js Anda
+                    if (typeof updateDashboard === 'function') {
+                        updateDashboard();
+                    }
+                }
+                
             } else {
                 console.warn('Target section not found for:', targetId);
             }
