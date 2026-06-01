@@ -138,71 +138,69 @@
           </button>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+          
+          <div class="card glass">
+            <div class="card-header" style="display: flex; justify-content: space-between;">
+              <span><i class="fas fa-id-card text-primary"></i> <span class="lang" data-en="Profile" data-id="Profil">Profile</span></span>
+              <span id="dashBmiBadge" style="font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--glass-input);">BMI: --</span>
+            </div>
+            <div class="user-info-grid" style="margin-top: 10px;">
+              <div class="info-item"><span class="info-label">Name</span><span class="info-value" id="dashName">-</span></div>
+              <div class="info-item"><span class="info-label">Age</span><span class="info-value" id="dashAge">-</span></div>
+              <div class="info-item"><span class="info-label">Height</span><span class="info-value" id="dashHeight">- cm</span></div>
+              <div class="info-item"><span class="info-label">Weight</span><span class="info-value" id="dashWeight">- kg</span></div>
+            </div>
+          </div>
+
           <div class="card glass">
             <div class="card-header">
-              <span
-                ><i class="fas fa-id-card text-primary"></i>
-                <span
-                  class="lang"
-                  data-en="Personal Information"
-                  data-id="Informasi Pribadi"
-                  >Personal Information</span
-                ></span
-              >
+              <span><i class="fas fa-bullseye text-primary"></i> <span class="lang" data-en="Daily Goal" data-id="Target Harian">Daily Goal</span></span>
             </div>
-            <div class="user-info-grid">
-              <div class="info-item">
-                <span class="info-label lang" data-en="Name" data-id="Nama"
-                  >Name</span
-                ><span class="info-value">-</span>
+            <div class="card-value" style="font-size: 1.8rem; margin-top: 10px;" id="dashCalorieText">
+              0 <span style="font-size: 1rem; color: var(--text-muted)">/ 0 Kcal</span>
+            </div>
+            <div class="progress-bar-container glass-input" style="height: 10px; margin-bottom: 15px;">
+              <div class="progress-bar" id="dashCalorieBar" style="width: 0%"></div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; font-size: 0.85rem;">
+              <div class="glass-input" style="padding: 8px; border-radius: 8px;">
+                <div style="color: #3b82f6; font-weight: bold;">Protein</div>
+                <div id="dashProteinText">0g</div>
               </div>
-              <div class="info-item">
-                <span class="info-label lang" data-en="Age" data-id="Usia"
-                  >Age</span
-                ><span class="info-value">-</span>
+              <div class="glass-input" style="padding: 8px; border-radius: 8px;">
+                <div style="color: #10b981; font-weight: bold;">Carbs</div>
+                <div id="dashCarbsText">0g</div>
               </div>
-              <div class="info-item">
-                <span class="info-label lang" data-en="Height" data-id="Tinggi"
-                  >Height</span
-                ><span class="info-value">- cm</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label lang" data-en="Weight" data-id="Berat"
-                  >Weight</span
-                ><span class="info-value">- kg</span>
+              <div class="glass-input" style="padding: 8px; border-radius: 8px;">
+                <div style="color: #f59e0b; font-weight: bold;">Fat</div>
+                <div id="dashFatText">0g</div>
               </div>
             </div>
           </div>
+
           <div class="card glass">
             <div class="card-header">
-              <span
-                ><i class="fas fa-weight text-primary"></i>
-                <span class="lang" data-en="BMI" data-id="BMI">BMI</span></span
-              >
-              <span class="lang" data-en="Normal" data-id="Normal">Normal</span>
+              <span><i class="fas fa-dumbbell text-primary"></i> Today's Workout</span>
             </div>
-            <div class="card-value">--</div>
-          </div>
-          <div class="card glass">
-            <div class="card-header">
-              <span
-                ><i class="fas fa-bullseye text-primary"></i>
-                <span class="lang" data-en="Daily Goal" data-id="Target Harian"
-                  >Daily Goal</span
-                ></span
-              >
-            </div>
-            <div class="card-value">
-              0
-              <span style="font-size: 1rem; color: var(--text-muted)"
-                >/ 0 Kcal</span
-              >
-            </div>
-            <div class="progress-bar-container glass-input">
-              <div class="progress-bar" style="width: 0%"></div>
+            <div id="dashWorkoutContainer" style="margin-top: 15px;">
+              <p class="text-muted" style="font-size: 0.9rem; text-align: center; margin-top: 20px;">
+                <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                No active plan. Generate one in the Workout Plan menu!
+              </p>
             </div>
           </div>
+
+          <div class="card glass-accent" style="display: flex; flex-direction: column; justify-content: center;">
+            <div class="card-header" style="margin-bottom: 10px;">
+              <span style="color: var(--primary-color);"><i class="fas fa-lightbulb"></i> AI Coach Insight</span>
+            </div>
+            <p id="dashAiInsight" style="font-style: italic; font-size: 1.05rem; line-height: 1.6; color: var(--text-main);">
+              "A journey of a thousand miles begins with a single step. Set your profile and let's crush those goals today!"
+            </p>
+          </div>
+
         </div>
       </div>
 

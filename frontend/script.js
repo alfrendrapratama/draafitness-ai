@@ -1136,27 +1136,88 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- 7. DASHBOARD UPDATER ---
     function updateDashboard() {
         const profile = loadFromSession('userProfile');
-        if (!profile) return;
+        
+        // 1. Update Profile Info
+        if (profile) {
+            document.getElementById('dashName').textContent = profile.name || '-';
+            document.getElementById('dashAge').textContent = profile.age ? `${profile.age} Yrs` : '-';
+            document.getElementById('dashHeight').textContent = profile.height ? `${profile.height} cm` : '-';
+            document.getElementById('dashWeight').textContent = profile.weight ? `${profile.weight} kg` : '-';
+            
+            const bmiBadge = document.getElementById('dashBmiBadge');
+            if (profile.bmi) {
+                bmiBadge.textContent = `BMI: ${profile.bmi.toFixed(1)} (${profile.bmiCategory})`;
+                bmiBadge.style.color = getBMICategoryColor(profile.bmiCategory);
+            }
 
-        const infoValues = document.querySelectorAll('#dashboard-view .info-value');
-        if (infoValues.length >= 4) {
-            infoValues[0].textContent = profile.name || '-';
-            infoValues[1].textContent = profile.age ? `${profile.age} Years` : '-'; // Ini bagian merubah umur
-            infoValues[2].textContent = `${profile.height} cm`;
-            infoValues[3].textContent = `${profile.weight} kg`;
+            // Set dynamic AI Insight based on goal
+            const insights = {
+                'weight_loss': '"Consistency in your caloric deficit is the key. You cannot out-train a bad diet!"',
+                'muscle_gain': '"Lift heavy, eat your protein, and prioritize recovery. Muscle is built while you rest."',
+                'maintenance': '"Balance is everything. Keep your activity steady and enjoy the healthy lifestyle!"'
+            };
+            if(profile.fitnessGoal) {
+                document.getElementById('dashAiInsight').textContent = insights[profile.fitnessGoal] || insights['maintenance'];
+            }
         }
 
-        const bmiCard = document.querySelector('#dashboard-view .card-value');
-        const bmiStatus = document.querySelector('#dashboard-view .card-header span:nth-child(2)');
-        if (profile.bmi && bmiCard) {
-            bmiCard.textContent = profile.bmi.toFixed(1);
-            bmiStatus.textContent = profile.bmiCategory;
-            bmiStatus.style.color = getBMICategoryColor(profile.bmiCategory);
+        // 2. Update Daily Goal & Macros (Sync with Session Progress)
+        let totalCal = 0;
+        let totalPro = 0; // Simplified estimation for macros based on logged food
+        let totalCarb = 0;
+        let totalFat = 0;
+        
+        // Jika ada kalori yang di-log di active session
+        if (currentSession && currentSession.nutritionLog) {
+            currentSession.nutritionLog.forEach(food => {
+                totalCal += parseInt(food.calories) || 0;
+                // Rough estimate just for visual dashboard feedback
+                totalPro += Math.round(food.calories * 0.05); 
+                totalCarb += Math.round(food.calories * 0.1);
+                totalFat += Math.round(food.calories * 0.03);
+            });
         }
 
-        const goalCard = document.querySelectorAll('#dashboard-view .card-value')[1];
-        if (profile.targetCalories && goalCard) {
-            goalCard.innerHTML = `0 <span style="font-size: 1rem; color: var(--text-muted)">/ ${profile.targetCalories} Kcal</span>`;
+        const targetCal = profile ? (profile.targetCalories || 0) : 0;
+        document.getElementById('dashCalorieText').innerHTML = `${totalCal} <span style="font-size: 1rem; color: var(--text-muted)">/ ${targetCal} Kcal</span>`;
+        
+        const percent = targetCal > 0 ? Math.min((totalCal / targetCal) * 100, 100) : 0;
+        document.getElementById('dashCalorieBar').style.width = `${percent}%`;
+        document.getElementById('dashCalorieBar').style.background = percent > 100 ? 'var(--danger-red)' : 'var(--primary-color)';
+
+        document.getElementById('dashProteinText').textContent = `${totalPro}g`;
+        document.getElementById('dashCarbsText').textContent = `${totalCarb}g`;
+        document.getElementById('dashFatText').textContent = `${totalFat}g`;
+
+        // 3. Update Today's Workout
+        const savedPlan = loadFromSession('workoutPlan');
+        const workoutContainer = document.getElementById('dashWorkoutContainer');
+        
+        if (savedPlan && savedPlan.weekly_schedule && savedPlan.weekly_schedule.length > 0) {
+            // Ambil jadwal hari pertama sebagai representasi "Today"
+            const todayPlan = savedPlan.weekly_schedule[0]; 
+            
+            let exercisesHTML = '';
+            if (todayPlan.exercises) {
+                exercisesHTML = todayPlan.exercises.slice(0, 3).map(ex => 
+                    `<div style="font-size: 0.85rem; padding: 8px; background: var(--glass-input); border-radius: 6px; margin-bottom: 5px;">
+                        <strong>${ex.name}</strong> • ${ex.sets} Sets
+                    </div>`
+                ).join('');
+                if (todayPlan.exercises.length > 3) {
+                    exercisesHTML += `<div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 5px;">+ ${todayPlan.exercises.length - 3} more exercises</div>`;
+                }
+            }
+
+            workoutContainer.innerHTML = `
+                <h4 style="color: var(--primary-color); margin-bottom: 5px;">${todayPlan.day}: ${todayPlan.type}</h4>
+                <div style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px;">
+                    ${exercisesHTML}
+                </div>
+                <button onclick="document.querySelector('[data-target=\\'progress-view\\']').click()" class="btn-primary glass-btn" style="width: 100%; padding: 8px;">
+                    <i class="fas fa-play"></i> Start Session
+                </button>
+            `;
         }
     }
 
