@@ -754,6 +754,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- UX LOGIC: WORKOUT EQUIPMENT AUTO-TOGGLE ---
+    const locationSelect = document.querySelector('select[name="workout_location"]');
+    const eqCheckboxes = document.querySelectorAll('input[name="equipment"]');
+    const eqNone = document.getElementById('eqNone');
+
+    // 1. Auto-select berdasarkan lokasi
+    if (locationSelect) {
+        locationSelect.addEventListener('change', (e) => {
+            const loc = e.target.value;
+            if (loc === 'gym') {
+                // Jika Gym: Centang semua kecuali 'No Equipment'
+                eqCheckboxes.forEach(cb => cb.checked = (cb.value !== 'none'));
+            } else if (loc === 'outdoor') {
+                // Jika Outdoor: Centang 'No Equipment' dan 'Pull-up Bar'
+                eqCheckboxes.forEach(cb => cb.checked = false);
+                eqNone.checked = true;
+                const pullup = document.querySelector('input[value="pullup_bar"]');
+                if(pullup) pullup.checked = true;
+            } else {
+                // Jika Home: Reset state (kosongkan)
+                eqCheckboxes.forEach(cb => cb.checked = false);
+            }
+        });
+    }
+
+    // 2. Mutual Exclusion: Jika 'No Equipment' dicentang, hapus centang alat lain
+    if (eqNone) {
+        eqNone.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                eqCheckboxes.forEach(cb => {
+                    if (cb !== eqNone) cb.checked = false;
+                });
+            }
+        });
+    }
+
+    // 3. Mutual Exclusion: Jika alat lain dicentang, hapus centang 'No Equipment'
+    eqCheckboxes.forEach(cb => {
+        if (cb !== eqNone) {
+            cb.addEventListener('change', () => {
+                if (cb.checked && eqNone) eqNone.checked = false;
+            });
+        }
+    });
+
     if (workoutForm) {
         workoutForm.addEventListener('submit', async (e) => {
             e.preventDefault();

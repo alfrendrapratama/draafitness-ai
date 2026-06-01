@@ -637,36 +637,28 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Available Equipment</label>
+              <label class="form-label lang" data-en="Available Equipment" data-id="Peralatan Tersedia">Available Equipment</label>
               <div
                 style="
                   display: grid;
-                  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                  gap: 10px;
-                  padding: 10px;
+                  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                  gap: 12px;
+                  padding: 15px;
                 "
                 class="glass-input"
+                id="equipmentCheckboxes"
               >
-                <label
-                  ><input type="checkbox" name="equipment" value="none" /> No
-                  Equipment</label
-                >
-                <label
-                  ><input type="checkbox" name="equipment" value="dumbbells" />
-                  Dumbbells</label
-                >
-                <label
-                  ><input type="checkbox" name="equipment" value="barbell" />
-                  Barbell</label
-                >
-                <label
-                  ><input
-                    type="checkbox"
-                    name="equipment"
-                    value="resistance_bands"
-                  />
-                  Bands</label
-                >
+                <!-- Opsi Bodyweight -->
+                <label><input type="checkbox" name="equipment" value="none" id="eqNone" /> No Equipment</label>
+                <!-- Opsi Free Weights -->
+                <label><input type="checkbox" name="equipment" value="dumbbells" /> Dumbbells</label>
+                <label><input type="checkbox" name="equipment" value="barbell" /> Barbell</label>
+                <label><input type="checkbox" name="equipment" value="kettlebells" /> Kettlebells</label>
+                <label><input type="checkbox" name="equipment" value="resistance_bands" /> Resistance Bands</label>
+                <!-- Opsi Gym -->
+                <label><input type="checkbox" name="equipment" value="cable_machine" /> Cable Machine</label>
+                <label><input type="checkbox" name="equipment" value="weight_machines" /> Weight Machines</label>
+                <label><input type="checkbox" name="equipment" value="pullup_bar" /> Pull-up Bar</label>
               </div>
             </div>
             <div style="margin-top: 30px">
